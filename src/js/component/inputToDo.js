@@ -8,13 +8,27 @@ export class InputToDo extends React.Component {
 		super();
 		this.state = {
 			list: [],
-			userInput: "",
-			done: false
+			userInput: ""
 		};
+	}
+	componentDidMount() {
+		fetch("https://assets.breatheco.de/apis/fake/todos/user/juanfer112")
+			.then(response => response.json())
+			.then(data => {
+				for (let items in data) {
+					this.setState({ list: [...this.state.list, data[items]] });
+				}
+			});
+	}
+	componentDidUpdate() {
+		fetch("https://assets.breatheco.de/apis/fake/todos/user/juanfer112", {
+			method: "PUT",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify(this.state.list)
+		});
 	}
 
 	isEmpty(str) {
-		console.log(str.replace(/^\s+|\s+$/gm, "").length);
 		return str.replace(/^\s+|\s+$/gm, "").length == 0;
 	}
 
@@ -23,17 +37,23 @@ export class InputToDo extends React.Component {
 			if (!this.isEmpty(this.state.userInput)) {
 				let listArray = this.state.list.concat(this.state.userInput);
 				this.setState({
-					list: listArray,
+					list: [
+						...this.state.list,
+						{ label: e.target.value, done: false }
+					],
 					userInput: ""
 				});
 			}
 		}
 	}
-	btnToList() {
+	btnToList(e) {
 		if (!this.isEmpty(this.state.userInput)) {
 			let listArray = this.state.list.concat(this.state.userInput);
 			this.setState({
-				list: listArray,
+				list: [
+					...this.state.list,
+					{ label: e.target.value, done: false }
+				],
 				userInput: ""
 			});
 		}
@@ -44,23 +64,18 @@ export class InputToDo extends React.Component {
 		});
 	};
 
-	checkDone = e => {
-		this.setState({
-			done: !this.state.done
-		});
-	};
-
-	/*checkBox = id => {
-		const checkElement = this.state.list.map(element => {
-			if (element.id == id) {
+	checkBox = (id, clas) => {
+		const checkElement = this.state.list.map((element, index) => {
+			if (index === id) {
 				element.done = !element.done;
 			}
 			return element;
 		});
+
 		this.setState({
-			task: checkElement
+			list: checkElement
 		});
-	};*/
+	};
 
 	render() {
 		return (
@@ -95,7 +110,8 @@ export class InputToDo extends React.Component {
 									<button
 										type="button"
 										className="btn btn-primary"
-										onClick={() => this.btnToList()}>
+										value={this.state.userInput}
+										onClick={e => this.btnToList(e)}>
 										agregar
 									</button>
 								</div>
@@ -107,7 +123,7 @@ export class InputToDo extends React.Component {
 								lista={this.state.list}
 								btnDeleteClicked={this.btnDeleteClicked}
 								done={this.state.done}
-								checkDone={this.checkDone}
+								checkBox={this.checkBox}
 							/>
 							<div>
 								{this.state.list.length == 1 ? (

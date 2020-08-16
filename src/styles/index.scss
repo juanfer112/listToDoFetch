@@ -70,3 +70,14 @@ input[type="checkbox"]{
       }
 }
 
+
+.done{
+    color: gray;
+    text-decoration:line-through;
+
+}
+.undone{
+    color: black;
+    text-decoration:none;
+
+}
